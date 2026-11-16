@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head >
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abresobres</title>
+    <style>body {
+        font-family: Arial, Helvetica,
+         sans-serif;
+        text-align: center;
+        margin-top: 50px
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+    }
+    .modalcontenido {
+        background-color: rgb(41, 22, 212);
+        padding: 25px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: scroll !important;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+    }
+    .grdcard {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 15px !important;
+        width: 100%;
+        margin-top: 20px;
+    }
+    .item-carta-libreria {
+        background: #f7e43a;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+    }
+    .item-carta-libreria-hov {
+        transform: translate(-3px);
+    }
+    .item-carta-libreria img {
+        width: 100%;
+        border-radius: 5px;
+        object-fit: contain;
+    }
+    .item-carta-libreria p {
+        text-align: center;
+        font-size: 12px;
+        margin: 8px 0 4px 0;
+        font-weight: bold;
+        color: #2d8fbd;
+    }
+    .item-carta-libreria span {
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        font-size: 11px;
+        background: #ffcb05;
+        color: #2a3a5e;
+        padding: 2px 6px;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    #images {
+        width: 450px;
+        height: 600px;
+        object-fit: cover;
+        border-radius: 10%;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: transform 0.1s;
+    }
+    #images:active {
+        transform: scale(0.95);
+    }</style>
+</head>
+<body style="background-color: rgb(73, 122, 214);">
+    <button id="btnlibreria">ver libreria de cartas</button>
+
+    <h1 style="text-align: center; color: yellow;"><strong>Bienvenido al Abresobres</strong></h1>
+
+    <div id="modallibreria" class="modal" style="display: none;">
+        <div class="modalcontenido">
+            <span id="cerrar-libreria" class="cerrar">&times;</span>
+            <h2>Tus Cartas</h2>
+            <div id="grdcard" class="grdcard"></div>
+        </div>
+    </div>
+
+    <div style="text-align: center;"> 
+        <img id="images" src="sobre surging sparks.jpg" alt="sobre 1">
+        <script>
+            const imgini = "sobre surging sparks.jpg"
+            const images = [
+                "charizard.jpg",
+                "eevee-ex.jpg",
+                "meowth.jpg",
+                "pikachu.jpg",
+                "black kyurem-ex.jpg",
+                "casform.jpg",
+                "counter gain.jpg",
+                "energy search pro.jpg",
+                "eternatus.jpg",
+                "exeggute.jpg",
+                "exeggutor.jpg",
+                "exxegutor-ex.jpg",
+                "gouging fire.jpg",
+                "latias-ex.jpg",
+                "megaton blower.jpg",
+                "pikachu-ex.jpg",
+                "pikachu-ex-full.jpg",
+                "victini.jpg"
+            ];
+            const limiteclicks = 10;
+            let contador = 0;
+            const imagenel = document.getElementById("images");
+            imagenel.src = imgini;
+            imagenel.addEventListener ("click", () => {
+                if (contador < limiteclicks) {
+                    const indicealeatorio = Math.floor(Math.random() * images.length);
+                    const nomimg = images[indicealeatorio];
+                    const nomcarta = nomimg.replace(".jpg", "").toUpperCase();
+
+
+                    imagenel.src = images[indicealeatorio];
+                    contador++;
+                    console.log('clics realizados: ${contador} de ${limiteclicks}')
+                    const cartaob = {
+                        nombre: nomcarta,
+                        imagen: nomimg
+                    };
+                    aregarcartaainventario(cartaob);
+                if (contador === limiteclicks){
+                    setTimeout(() => {
+                        imagenel.src = imgini;
+                        alert("abrir siguiente sobre");
+                        contador = 0;
+                    }, 1000);
+                }
+                }
+            });
+        </script>
+    </div>
+    <script>
+        const btnlibreria = document.getElementById('btnlibreria');
+        const modallibreria = document.getElementById('modallibreria');
+        const cerrarlibreria = document.getElementById('cerrar-libreria');
+        const grdcard = document.getElementById('grdcard');
+
+        btnlibreria.addEventListener('click', () => {
+            modallibreria.style.display = 'flex';
+            cargarlibreria();
+        });
+
+        cerrarlibreria.addEventListener('click', () => {
+            modallibreria.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modallibreria){
+                modallibreria.style.display = 'none';
+            }
+        });
+        function aregarcartaainventario(nuevacarta) {
+            let miscartas = JSON.parse(localStorage.getItem('miscartas')) || [];
+            let cartaexistente = miscartas.find(carta => carta.nombre === nuevacarta.nombre);
+
+            if (cartaexistente) {
+                cartaexistente.cantidad = (cartaexistente.cantidad || 1) + 1;
+            } else {
+                nuevacarta.cantidad = 1;
+                miscartas.push(nuevacarta);
+            }
+            localStorage.setItem('miscartas', JSON.stringify(miscartas));
+            
+        }
+        
+
+        function cargarlibreria() {
+            grdcard.innerHTML = '';
+
+            
+            let miscartas = JSON.parse(localStorage.getItem('miscartas')) || [];
+            
+            if (miscartas.length === 0) {
+                grdcard.innerHTML = '<p>Aun no tienes cartas !abre algunos sobres!<p>';
+                return;
+            }
+
+            miscartas.forEach(carta => {
+                const cartadiv = document.createElement('div');
+                cartadiv.classList.add('item-carta-libreria');
+                cartadiv.innerHTML = '<img src="' + carta.imagen +'" alt="' +carta.nombre + '" style="eidth: 100%; border-radius: 5px;">' +
+                                     '<p style="text-align:center; font.size: 12px; margin: 5px 0;">' +carta.nombre +'</p>' +
+                                     '<span style="display: block; text-align: center; font-weight: bold; font-size: 11px;">' +carta.cantidad + '</span>';
+
+                grdcard.appendChild(cartadiv);
+            });
+            grdcard.addEventListener('click', (event) => {
+                if (event.target.classList.contains('imagen-carta-interactiva')) {
+                    const index = event.target.getAtribute('data-index');
+                    sumarCantidadCarta(index);
+                }
+            })
+            function sumarCantidadCarta(posicion) {
+                let miscartas=JSON.parse(localStorage.getItem('miscartas')) || [];
+                console.log("cartas leidas desde localstorage:", miscartas);
+
+                if (miscartas[posicion]) {
+                    miscartas[posicion].cantidad = (miscartas[posicion].cantidad || 1) + 1;
+
+                    localStorage.setItem('miscartas',JSON.stringify(miscartas));
+
+                    cargarlibreria();
+                }
+            }
+        }
+    </script>
+    <h2 style="text-align: center;">abre un sobre</h2>
+</body>
+</html>
